@@ -11,7 +11,7 @@ import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener
+public class LogWindow extends BaseInternalFrame implements LogChangeListener
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;

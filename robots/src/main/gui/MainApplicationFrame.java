@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
 import log.Logger;
 
@@ -38,14 +39,26 @@ public class MainApplicationFrame extends JFrame
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                confirmExit();
+            }
+        });
     }
 
     private void confirmExit() {
-
+        int response = JOptionPane.showConfirmDialog(this,
+                "Вы действительно хотите выйти?",
+                "Подтверждение",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        if (response == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
     }
+
 
     protected LogWindow createLogWindow()
     {
@@ -159,10 +172,31 @@ public class MainApplicationFrame extends JFrame
         
         JMenu lookAndFeelMenu = createLookAndFeelMenu();
         JMenu testMenu = createTestMenu();
+        JMenuItem toolkitMenu = createToolkitMenu();
 
+        menuBar.add(toolkitMenu);
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         return menuBar;
+    }
+
+    private JMenu createToolkitMenu() {
+        JMenu toolkitMenu = new JMenu("Приложение");
+        toolkitMenu.setMnemonic(KeyEvent.VK_T);
+
+        {
+            JMenuItem exitMenuItem = new JMenuItem("Выйти");
+
+            exitMenuItem.addActionListener((event) -> {
+                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
+                        new WindowEvent(this, WindowEvent.WINDOW_CLOSING)
+                );
+            });
+            toolkitMenu.add(exitMenuItem);
+        }
+
+
+        return toolkitMenu;
     }
     
     private void setLookAndFeel(String className)
