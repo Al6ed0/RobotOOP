@@ -47,4 +47,9 @@ public class LogWindow extends BaseInternalFrame implements LogChangeListener
     {
         EventQueue.invokeLater(this::updateLogContent);
     }
+
+    @Override
+    protected void closeAction() {
+        m_logSource.unregisterListener(this);
+    }
 }
