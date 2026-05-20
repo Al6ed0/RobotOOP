@@ -1,6 +1,6 @@
 package gui;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -12,9 +12,13 @@ public class GameWindow extends BaseInternalFrame
     {
         super("Игровое поле", true, true, true, true);
         m_visualizer = new GameVisualizer();
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(m_visualizer, BorderLayout.CENTER);
+        JPanel panel = new JPanel(new CardLayout());
+        panel.add(m_visualizer, "Game");
         getContentPane().add(panel);
         pack();
+    }
+
+    public GameVisualizer getVisualiser() {
+        return m_visualizer;
     }
 }

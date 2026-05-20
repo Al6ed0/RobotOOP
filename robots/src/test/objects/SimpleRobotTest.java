@@ -1,5 +1,6 @@
 package objects;
 
+import gui.GameContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,9 @@ public class SimpleRobotTest {
 
         moveRobot.invoke(robot, 0.05, 0.0, 10.0, 400, 400);
 
-        double resultX = robot.getRobotX();
-        double resultY = robot.getRobotY();
-        double resultDirection = robot.getRobotDirection();
+        double resultX = robot.getX();
+        double resultY = robot.getY();
+        double resultDirection = robot.getDirection();
 
         Assertions.assertEquals(0.5, resultX, 1e-6);
         Assertions.assertEquals(0.0, resultY, 1e-6);
@@ -66,9 +67,9 @@ public class SimpleRobotTest {
 
         moveRobot.invoke(robot, 0.1, 0.001, 10.0, 400, 400);
 
-        double resultX = robot.getRobotX();
-        double resultY = robot.getRobotY();
-        double resultDirection = robot.getRobotDirection();
+        double resultX = robot.getX();
+        double resultY = robot.getY();
+        double resultDirection = robot.getDirection();
 
         Assertions.assertFalse(Double.isNaN(resultX));
         Assertions.assertFalse(Double.isNaN(resultY));
@@ -81,30 +82,30 @@ public class SimpleRobotTest {
 
         robot.setTargetPosition(new Point(300, 100));
         for (int i = 0; i < 200; i++) {
-            robot.onUpdateEvent();
+            robot.update();
         }
-        Assertions.assertEquals(300, robot.getRobotX(), 1e-9);
-        Assertions.assertEquals(100, robot.getRobotY(), 1e-9);
-        Assertions.assertEquals(0.0, robot.getRobotDirection());
+        Assertions.assertEquals(300, robot.getX(), 1e-9);
+        Assertions.assertEquals(100, robot.getY(), 1e-9);
+        Assertions.assertEquals(0.0, robot.getDirection());
 
         robot.setTargetPosition(new Point(300, 300));
         for (int i = 0; i < 500; i++) {
-            robot.onUpdateEvent();
+            robot.update();
         }
 
-        Assertions.assertEquals(300, robot.getRobotX(), 0.5);
-        Assertions.assertEquals(300, robot.getRobotY(), 0.5);
-        Assertions.assertEquals(Math.PI, robot.getRobotDirection(), 0.05);
+        Assertions.assertEquals(300, robot.getX(), 0.5);
+        Assertions.assertEquals(300, robot.getY(), 0.5);
+        Assertions.assertEquals(Math.PI, robot.getDirection(), 0.05);
 
         robot.setTargetPosition(new Point(300, 200));
         for (int i = 0; i < 1000; i++) {
-            robot.onUpdateEvent();
+            robot.update();
         }
 
-        Assertions.assertEquals(300, robot.getRobotX(), 0.5);
-        Assertions.assertEquals(200, robot.getRobotY(), 0.5);
-        Assertions.assertTrue(robot.getRobotDirection() >= 0.0
-                && robot.getRobotDirection() < 2*Math.PI);
+        Assertions.assertEquals(300, robot.getX(), 0.5);
+        Assertions.assertEquals(200, robot.getY(), 0.5);
+        Assertions.assertTrue(robot.getDirection() >= 0.0
+                && robot.getDirection() < 2*Math.PI);
     }
 
 }

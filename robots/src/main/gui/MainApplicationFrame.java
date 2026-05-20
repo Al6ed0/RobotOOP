@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
 import log.Logger;
+import objects.Enemies.SimpleDummy;
 
 /**
  * Что требуется сделать:
@@ -18,7 +19,7 @@ import log.Logger;
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    
+    GameWindow gameWindow;
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -34,8 +35,8 @@ public class MainApplicationFrame extends JFrame
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400,  400);
+        gameWindow = new GameWindow();
+        gameWindow.setSize(600,  600);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -150,8 +151,9 @@ public class MainApplicationFrame extends JFrame
                 "Тестовые команды");
 
         JMenuItem addLogMessageItem = createLogTestItem();
-
+        JMenuItem summonEnemyItem = createSimpleSummonItem();
         testMenu.add(addLogMessageItem);
+        testMenu.add(summonEnemyItem);
 
         return testMenu;
     }
@@ -162,6 +164,13 @@ public class MainApplicationFrame extends JFrame
             Logger.debug("Новая строка");
         });
         return addLogMessageItem;
+    }
+    private JMenuItem createSimpleSummonItem() {
+        JMenuItem summonMenuItem = new JMenuItem("Создать противика");
+        summonMenuItem.addActionListener((event) -> {
+            gameWindow.getVisualiser().spawnMob(new SimpleDummy(300, 100, 0.01));
+        });
+        return summonMenuItem;
     }
 
     // Создание Меню
@@ -183,21 +192,24 @@ public class MainApplicationFrame extends JFrame
     private JMenu createToolkitMenu() {
         JMenu toolkitMenu = new JMenu("Приложение");
         toolkitMenu.setMnemonic(KeyEvent.VK_T);
+        JMenuItem exitMenuItem = createExitMenuItem();
 
-        {
-            JMenuItem exitMenuItem = new JMenuItem("Выйти");
-
-            exitMenuItem.addActionListener((event) -> {
-                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
-                        new WindowEvent(this, WindowEvent.WINDOW_CLOSING)
-                );
-            });
-            toolkitMenu.add(exitMenuItem);
-        }
-
+        toolkitMenu.add(exitMenuItem);
 
         return toolkitMenu;
     }
+
+    private JMenuItem createExitMenuItem() {
+        JMenuItem exitMenuItem = new JMenuItem("Выйти");
+
+        exitMenuItem.addActionListener((event) -> {
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
+                    new WindowEvent(this, WindowEvent.WINDOW_CLOSING)
+            );
+        });
+        return exitMenuItem;
+    }
+
     
     private void setLookAndFeel(String className)
     {

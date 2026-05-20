@@ -1,6 +1,6 @@
 package objects;
 
-import log.Logger;
+import gui.GameContext;
 
 import java.awt.*;
 
@@ -62,7 +62,7 @@ public class SimpleRobot {
         m_targetPositionY = p.y;
     }
 
-    public void onUpdateEvent()
+    public void update()
     {
         double distance = distance(m_targetPositionX, m_targetPositionY,
                 m_robotPositionX, m_robotPositionY);
@@ -177,13 +177,13 @@ public class SimpleRobot {
         return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 //-----------------------Get_Методы-------------------------
-    public double getRobotX() {
+    public double getX() {
         return this.m_robotPositionX;
     }
-    public double getRobotY() {
+    public double getY() {
         return this.m_robotPositionY;
     }
-    public double getRobotDirection() {
+    public double getDirection() {
         return this.m_robotDirection;
     }
     public int getTargetPositionX() {
