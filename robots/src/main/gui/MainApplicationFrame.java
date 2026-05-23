@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
 import log.Logger;
+import objects.Enemies.ShooterDummy;
 import objects.Enemies.SimpleDummy;
 
 /**
@@ -152,8 +153,10 @@ public class MainApplicationFrame extends JFrame
 
         JMenuItem addLogMessageItem = createLogTestItem();
         JMenuItem summonEnemyItem = createSimpleSummonItem();
+        JMenuItem summonShooterEnemyItem = createShooterSummonItem();
         testMenu.add(addLogMessageItem);
         testMenu.add(summonEnemyItem);
+        testMenu.add(summonShooterEnemyItem);
 
         return testMenu;
     }
@@ -166,9 +169,16 @@ public class MainApplicationFrame extends JFrame
         return addLogMessageItem;
     }
     private JMenuItem createSimpleSummonItem() {
-        JMenuItem summonMenuItem = new JMenuItem("Создать противика");
+        JMenuItem summonMenuItem = new JMenuItem("Создать болванчика");
         summonMenuItem.addActionListener((event) -> {
-            gameWindow.getVisualiser().spawnMob(new SimpleDummy(300, 100, 0.01));
+            gameWindow.getManager().spawnMob(new SimpleDummy(300, 100, 0.02));
+        });
+        return summonMenuItem;
+    }
+    private JMenuItem createShooterSummonItem() {
+        JMenuItem summonMenuItem = new JMenuItem("Создать стрелка");
+        summonMenuItem.addActionListener((event) -> {
+            gameWindow.getManager().spawnMob(new ShooterDummy(300, 100, 0.01));
         });
         return summonMenuItem;
     }

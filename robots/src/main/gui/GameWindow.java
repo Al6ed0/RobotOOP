@@ -1,5 +1,7 @@
 package gui;
 
+import api.GameManager;
+
 import java.awt.*;
 
 import javax.swing.JInternalFrame;
@@ -7,18 +9,18 @@ import javax.swing.JPanel;
 
 public class GameWindow extends BaseInternalFrame
 {
-    private final GameVisualizer m_visualizer;
+    private final GameManager m_manager;
     public GameWindow() 
     {
         super("Игровое поле", true, true, true, true);
-        m_visualizer = new GameVisualizer();
+        m_manager = new GameManager();
         JPanel panel = new JPanel(new CardLayout());
-        panel.add(m_visualizer, "Game");
+        panel.add(m_manager.getGameVisualizer(), "Game");
         getContentPane().add(panel);
         pack();
     }
 
-    public GameVisualizer getVisualiser() {
-        return m_visualizer;
+    public GameManager getManager() {
+        return m_manager;
     }
 }

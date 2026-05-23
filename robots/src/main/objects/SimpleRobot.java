@@ -1,7 +1,5 @@
 package objects;
 
-import gui.GameContext;
-
 import java.awt.*;
 
 
