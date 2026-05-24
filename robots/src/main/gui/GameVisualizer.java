@@ -93,11 +93,4 @@ public class GameVisualizer extends JPanel implements ModelListener
         }
     }
 
-//------------------------------Вспомогательные_Методы------------------------------
-    private static int round(double value)
-    {
-        return (int)(value + 0.5);
-    }
-
-
 }

@@ -1,8 +1,10 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyVetoException;
+import java.io.*;
+import java.util.Properties;
 
 import javax.swing.*;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -20,7 +22,10 @@ import objects.Enemies.SimpleDummy;
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    GameWindow gameWindow;
+    private GameWindow gameWindow;
+    private LogWindow logWindow;
+    private final File profileFile = new File(System.getProperty("user.home"), "profile.conf");
+
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -33,14 +38,24 @@ public class MainApplicationFrame extends JFrame
         setContentPane(desktopPane);
         
         
-        LogWindow logWindow = createLogWindow();
+        this.logWindow = createLogWindow();
         addWindow(logWindow);
 
-        gameWindow = new GameWindow();
+        this.gameWindow = new GameWindow();
         gameWindow.setSize(600,  600);
         addWindow(gameWindow);
 
+        if (profileFile.exists()) {
+            int option = JOptionPane.showConfirmDialog(this,
+                    "Найден сохранённый профиль.\nВосстановить?",
+                    "Восстановление", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                loadProfile();
+            }
+        }
+
         setJMenuBar(generateMenuBar());
+
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -57,6 +72,7 @@ public class MainApplicationFrame extends JFrame
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {
+            saveProfile();
             System.exit(0);
         }
     }
@@ -171,7 +187,7 @@ public class MainApplicationFrame extends JFrame
     private JMenuItem createSimpleSummonItem() {
         JMenuItem summonMenuItem = new JMenuItem("Создать болванчика");
         summonMenuItem.addActionListener((event) -> {
-            gameWindow.getManager().spawnMob(new SimpleDummy(300, 100, 0.02));
+            gameWindow.getManager().spawnMob(new SimpleDummy(300, 100, 0.02 ));
         });
         return summonMenuItem;
     }
@@ -232,6 +248,84 @@ public class MainApplicationFrame extends JFrame
             | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
             // just ignore
+        }
+    }
+
+    private void loadProfile() {
+        Properties props = new Properties();
+        try (InputStream is = new FileInputStream(profileFile)) {
+            props.load(is);
+            setBounds(
+                    Integer.parseInt(props.getProperty("main.x")),
+                    Integer.parseInt(props.getProperty("main.y")),
+                    Integer.parseInt(props.getProperty("main.w")),
+                    Integer.parseInt(props.getProperty("main.h"))
+            );
+            setExtendedState(Integer.parseInt(props.getProperty("main.state")));
+            restoreInternalFrame(props, "game", gameWindow);
+            restoreInternalFrame(props, "log", logWindow);
+        } catch (IOException | PropertyVetoException e) {
+            Logger.error("Возникла ошибка при загрузке профиля " + e.getMessage());
+        }
+    }
+
+    private void restoreInternalFrame(Properties props, String prefix, JInternalFrame frame)
+            throws PropertyVetoException {
+        if (frame != null && props.containsKey(prefix + ".x")) {
+            frame.setBounds(
+                    Integer.parseInt(props.getProperty(prefix + ".x")),
+                    Integer.parseInt(props.getProperty(prefix + ".y")),
+                    Integer.parseInt(props.getProperty(prefix + ".w")),
+                    Integer.parseInt(props.getProperty(prefix + ".h"))
+            );
+            frame.setVisible(Boolean.parseBoolean(props.getProperty(prefix + ".visible", "true")));
+            boolean isMaximum = Boolean.parseBoolean(props.getProperty(prefix + ".max", "false"));
+
+            if (isMaximum) {
+                frame.setMaximum(true);
+                frame.setIcon(Boolean.parseBoolean(props.getProperty(prefix + ".icon")));
+            } else {
+                frame.setIcon(Boolean.parseBoolean(props.getProperty(prefix + ".icon")));
+            }
+        }
+    }
+
+    private void saveProfile() {
+        Properties props = new Properties();
+
+        props.setProperty("main.x", String.valueOf(getX()));
+        props.setProperty("main.y", String.valueOf(getY()));
+        props.setProperty("main.w", String.valueOf(getWidth()));
+        props.setProperty("main.h", String.valueOf(getHeight()));
+        props.setProperty("main.state", String.valueOf(getExtendedState()));
+
+        saveInternalFrame(props, "game", gameWindow);
+
+        saveInternalFrame(props, "log", logWindow);
+
+        try (OutputStream out = new FileOutputStream(profileFile)) {
+            props.store(out, "Robot App Profile");
+        } catch (IOException e) {
+            Logger.error("Возникла ошибка при сохранении профиля " + e.getMessage());
+        }
+    }
+
+    private void saveInternalFrame(Properties props, String prefix, JInternalFrame frame) {
+        if (frame != null) {
+            props.setProperty(prefix + ".max", String.valueOf(frame.isMaximum()));
+            props.setProperty(prefix + ".visible", String.valueOf(frame.isVisible()));
+            props.setProperty(prefix + ".icon", String.valueOf(frame.isIcon()));
+
+            Rectangle bounds;
+            if (frame instanceof BaseInternalFrame) {
+                bounds = ((BaseInternalFrame) frame).getNormalBounds();
+            } else {
+                bounds = frame.getBounds();
+            }
+            props.setProperty(prefix + ".x", String.valueOf(bounds.x));
+            props.setProperty(prefix + ".y", String.valueOf(bounds.y));
+            props.setProperty(prefix + ".w", String.valueOf(bounds.width));
+            props.setProperty(prefix + ".h", String.valueOf(bounds.height));
         }
     }
 }
